@@ -24,8 +24,7 @@ AI-powered elderly safety wearable for real-time gait analysis, fall detection, 
 
 ## Implementation Stages
 
-![Work Plan](./work_plan.png)
-
+![alt text](image.png)
 ## Features
 - Real-time fall detection
 - Abnormal gait detection
