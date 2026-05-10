@@ -1,5 +1,4 @@
 # Guardian 360
-
 AI-powered elderly safety wearable for real-time gait analysis, fall detection, alerts, and caregiver monitoring.
 
 ## Tech Stack
