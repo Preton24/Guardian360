@@ -43,11 +43,46 @@
 \title{Guardian 360: AI-Based Elderly Safety and Fall Risk Prediction
 Wearable System Using CNN-GRU Architecture}
 
-\author{%
-  \IEEEauthorblockN{Author One\textsuperscript{1},\ Author Two\textsuperscript{2},\ Faculty Advisor\textsuperscript{3}}\\
-  \IEEEauthorblockA{\textsuperscript{1,2,3}Department of Electronics and Communication Engineering,\\
-  Institution Name, City, Country\\
-  \texttt{\{author1, author2, advisor\}@institution.edu}}
+\author{
+\IEEEauthorblockN{Dr.Anil B C}
+\IEEEauthorblockA{
+\textit{Professor and Head Department of CSE(AI \& ML)} \\
+\textit{JSS Academy of Technical Education} \\
+Bengaluru, India \\
+hodaiml@jssateb.ac.in
+}
+\and
+\IEEEauthorblockN{Abhinav Chandra. HS}
+\IEEEauthorblockA{
+\textit{Department of CSE(AI \& ML)} \\
+\textit{JSS Academy of Technical Education} \\
+Bengaluru, India \\
+abhinavchandra@jssate.edu.in
+}
+\and
+\IEEEauthorblockN{Dikshitha N}
+\IEEEauthorblockA{
+\textit{Department of CSE(AI \& ML)} \\
+\textit{JSS Academy of Technical Education} \\
+Bengaluru, India \\
+dikshithan@gmail.com
+}
+\and
+\IEEEauthorblockN{S V Preethi}
+\IEEEauthorblockA{
+\textit{Department of CSE(AI \& ML)} \\
+\textit{JSS Academy of Technical Education} \\
+Bengaluru, India \\
+preethisv24@gmail.com
+}
+\and
+\IEEEauthorblockN{Sahana H M}
+\IEEEauthorblockA{
+\textit{Department of CSE(AI \& ML)} \\
+\textit{JSS Academy of Technical Education} \\
+Bengaluru, India \\
+sahanaa1215@gmail.com
+}
 }
 
 % -------------------------------------------------------
@@ -78,14 +113,10 @@ occurs. The wrist-worn device additionally monitors heart rate, blood
 oxygen saturation (SpO$_2$), and body temperature via integrated sensors,
 and incorporates GPS tracking, an SOS pushbutton, a piezoelectric buzzer,
 and an OLED display. Emergency notifications are delivered to caregivers
-through a Firebase IoT cloud pipeline. Experimental evaluation on the
-SisFall, MobiAct, and UP-Fall Detection benchmark datasets, supplemented
-with collected gait sequences, demonstrates that the CNN-GRU model achieves
-\textbf{96.4\%} overall classification accuracy with an inference latency
-of \textbf{13.7\,ms} on the ESP32, outperforming CNN-LSTM, standalone CNN,
-Random Forest, and SVM baselines while consuming only 178\,KB of flash
-memory. Guardian~360 advances the state of the art toward proactive,
-personalized, and embedded elderly healthcare.
+through a Firebase IoT cloud pipeline. The proposed CNN-GRU model is
+evaluated on the SisFall, MobiAct, and UP-Fall Detection benchmark datasets,
+supplemented with collected gait sequences. Guardian~360 advances the state
+of the art toward proactive, personalized, and embedded elderly healthcare.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -139,9 +170,8 @@ choice for TinyML deployment on the ESP32 microcontroller.
         photoplethysmography (PPG), GPS, and emergency-alerting subsystems.
   \item A proactive fall-risk prediction pipeline identifying unstable gait
         sequences \emph{before} a fall event occurs.
-  \item Experimental validation on three public benchmark datasets showing
-        state-of-the-art accuracy at low computational cost.
-  \item Full TensorFlow Lite deployment achieving sub-15\,ms inference on a
+  \item Experimental validation on three public benchmark datasets.
+  \item Full TensorFlow Lite deployment targeting sub-15\,ms inference on a
         240\,MHz dual-core microcontroller.
 \end{itemize}
 
@@ -151,9 +181,7 @@ Section~\ref{sec:prob} states the problem. Section~\ref{sec:proposed}
 describes the proposed system. Sections~\ref{sec:arch}--\ref{sec:dataset}
 cover system architecture, methodology, the CNN-GRU model, and dataset
 details. Sections~\ref{sec:hw}--\ref{sec:exp} describe hardware and
-experimental setup. Sections~\ref{sec:results}--\ref{sec:future} present
-results, comparative analysis, advantages, limitations, and future scope.
-Section~\ref{sec:conclusion} concludes.
+experimental setup. Section~\ref{sec:conclusion} concludes.
 
 % -------------------------------------------------------
 \section{Literature Survey}
@@ -162,111 +190,319 @@ Section~\ref{sec:conclusion} concludes.
 
 \subsection{IoT-Based Remote Elderly Monitoring}
 
-Bandara et al.~\cite{bandara2020} developed a sensor platform integrating
-wearable and environmental IoT sensors with MQTT communication and
-cloud-based monitoring, achieving reliable real-time data acquisition but
-lacking predictive intelligence. Salma et al.~\cite{salma2025} conducted a
-PRISMA-based scoping review of Remote Monitoring Systems (RMS) for
-high-risk elderly patients, finding evidence of reduced unplanned
-hospitalizations but noting significant heterogeneity and absence of
-long-term evaluation. Pasrija et al.~\cite{pasrija2025} demonstrated that
-IoT-based continuous monitoring improves emergency response time and elderly
-independence, yet identified persistent gaps in AI-based predictive
-analytics. Mohammed and Hasan~\cite{mohammed2022} implemented a Raspberry
-Pi-based smart healthcare monitoring system achieving approximately 97\%
-heart-rate accuracy, but without fall prediction or anomaly forecasting.
+Bandara et al.~\cite{bandara2020} developed a comprehensive sensor platform
+that integrated both wearable body-worn sensors and environmental IoT
+devices deployed around the home, using the MQTT lightweight messaging
+protocol for reliable real-time data transmission and cloud-based
+visualization. The platform demonstrated consistent data acquisition across
+multiple sensor modalities and showed promise for unobtrusive remote
+monitoring; however, the system functioned purely as a data pipeline without
+any layer of machine learning or predictive intelligence, meaning
+caregivers could only react to raw readings rather than receive early
+warnings of deteriorating health states.
+
+Salma et al.~\cite{salma2025} conducted a rigorous PRISMA-guided scoping
+review of Remote Monitoring Systems (RMS) designed for high-risk elderly
+patients across multiple chronic conditions. Analysing dozens of peer-reviewed
+studies, the authors found consistent evidence that continuous IoT-based
+monitoring contributed to reduced rates of unplanned hospitalization and
+improved adherence to care plans. Nonetheless, they cautioned that
+significant heterogeneity in study design, sensor modalities, and outcome
+measures made cross-study comparison difficult, and that no long-term
+large-scale clinical validation of such systems existed at the time of
+review.
+
+Pasrija et al.~\cite{pasrija2025} presented a broad empirical argument for
+the adoption of IoT-based continuous monitoring to support elderly
+independence and improve emergency response times. Their work demonstrated
+that remote connectivity between sensor nodes and caregiving staff could
+substantially reduce the interval between an adverse event and a clinical
+response; however, the authors themselves identified persistent and critical
+gaps in AI-based predictive analytics, noting that existing deployments
+were almost uniformly reactive rather than anticipatory in nature.
+
+Mohammed and Hasan~\cite{mohammed2022} implemented a Raspberry Pi-based
+smart healthcare monitoring system capable of reading and transmitting
+physiological signals in near real-time, achieving approximately 97\%
+heart-rate measurement accuracy under controlled conditions. The system
+demonstrated that low-cost single-board computers could serve as
+effective gateways for health data aggregation and cloud communication.
+However, the platform was limited to physiological sensing and did not
+incorporate any mechanism for fall detection, fall prediction, or movement
+anomaly forecasting, making it unsuitable for safety-critical applications
+where mobility and balance are the primary concern.
+
 Augastiny et al.~\cite{augastiny2023} proposed a NodeMCU-based IoT health
-monitoring system for aged people enabling real-time alerts; however, it
-relies solely on threshold-based detection with no AI capability.
-Ravikumar et al.~\cite{ravikumar2023} surveyed IoT-enabled Remote Patient
-Monitoring systems, demonstrating improved healthcare quality and cost
-reduction but noting the absence of a unified, intelligent, deployable
-solution.
+monitoring system specifically designed for aged individuals, enabling
+real-time tracking of temperature, pulse rate, and other physiological
+parameters with automated alerts delivered via cloud platforms and mobile
+applications. While the system offered convenient remote accessibility and
+timely threshold-based notifications, it relied entirely on hard-coded
+numerical thresholds for alert generation and incorporated no machine
+learning models. As a result, it was inherently unable to detect nuanced
+patterns indicative of progressive health deterioration or impending falls.
+
+Ravikumar et al.~\cite{ravikumar2023} conducted a structured survey of
+IoT-enabled Remote Patient Monitoring (RPM) systems, documenting their
+positive impact on patient outcomes, reduction of unnecessary in-person
+clinic visits, and overall healthcare cost reduction for chronic disease
+management. The authors highlighted how real-time connectivity had begun
+transforming post-acute care and home-based rehabilitation. Despite these
+benefits, the survey noted the persistent absence of a unified, intelligent,
+and deployment-ready solution that could seamlessly combine physiological
+monitoring with AI-driven motion and gait analysis.
 
 \subsection{Wearable Sensors and Activity Recognition}
 
-Attal et al.~\cite{attal2015} conducted a comparative study of supervised
-(k-NN, SVM, Random Forest, GMM) and unsupervised (K-means, HMM) techniques
-for human activity recognition using IMU data from six subjects performing
-12 daily activities. Their k-NN classifier achieved approximately 99\%
-accuracy; however, the work lacked real-time deployment and any fall-risk
-prediction capability. Al-khafajiy et al.~\cite{alkhafajiy2019} proposed a
-wearable IoT health monitoring system (SW-SHMS) achieving less than 1\,ms
-data-transmission latency but focused exclusively on physiological data
-without gait or fall analysis. Rahmani et al.~\cite{rahmani2024} introduced
-the EmoWear multimodal dataset collected from 49 participants using IMU,
-ECG, BVP, EDA, and respiration sensors, demonstrating the feasibility of
-simultaneous gait, voice, and emotion recognition from a single wearable
-unit. Saraubon et al.~\cite{saraubon2018} implemented a smart elderly-care
-system using Raspberry Pi, accelerometers, and CNN-based acoustic detection,
-achieving approximately 93\% fall-detection accuracy, but without
-predictive analytics or personalized monitoring.
+Attal et al.~\cite{attal2015} conducted one of the most comprehensive
+early comparative studies of supervised and unsupervised machine learning
+techniques applied to human activity recognition using inertial measurement
+unit data. The study evaluated k-Nearest Neighbour (k-NN), Support Vector
+Machine (SVM), Random Forest, Gaussian Mixture Model (GMM), K-means
+clustering, and Hidden Markov Model (HMM) classifiers on data collected
+from six subjects performing twelve distinct activities of daily living
+using three IMU sensors placed at the waist and wrists. The k-NN classifier
+achieved the highest classification accuracy of approximately 99\% for
+coarse activity classes; however, the work used entirely offline data,
+lacked any real-time embedded deployment, and made no attempt to distinguish
+deteriorating gait patterns or predict fall risk from the activity sequences.
+
+Al-khafajiy et al.~\cite{alkhafajiy2019} proposed the Smart Wearable
+Secure Health Monitoring System (SW-SHMS), a wearable IoT platform designed
+for continuous remote monitoring of elderly patients. The system achieved
+data transmission latency of less than 1\,ms under typical network
+conditions, demonstrating the viability of low-latency wearable-to-cloud
+pipelines for healthcare applications. The architecture used dedicated
+hardware encryption for data security and a structured cloud storage
+backend for caregiver access. Despite these engineering achievements, the
+system focused exclusively on physiological parameters such as heart rate
+and blood pressure, with no consideration of gait dynamics, movement
+classification, or fall-related analysis.
+
+Rahmani et al.~\cite{rahmani2024} introduced the EmoWear dataset, a
+multimodal physiological and motion dataset collected from 49 participants
+using a single wrist-worn device that simultaneously captured IMU
+(accelerometer and gyroscope), electrocardiogram (ECG), blood volume pulse
+(BVP), electrodermal activity (EDA), and respiration signals. The study
+demonstrated that a single wrist-worn sensor unit could provide sufficient
+signal diversity for simultaneous gait analysis, physical activity
+recognition, and emotion state estimation, making a strong case for
+multimodal wearables in holistic health monitoring. However, data collection
+was performed in controlled laboratory settings, and no real-time inference
+pipeline was developed or evaluated.
+
+Saraubon et al.~\cite{saraubon2018} implemented a smart elderly-care system
+using a combination of Raspberry Pi single-board computers, wrist-worn
+accelerometers, and a convolutional neural network applied to acoustic
+signals for fall detection. The system was one of the earlier examples of
+deploying deep learning at the edge for elderly safety and achieved
+approximately 93\% fall-detection accuracy on their experimental dataset,
+demonstrating that accelerometer-based features consistently outperformed
+acoustic features in detection reliability. Despite this contribution, the
+system was designed exclusively to detect falls post-occurrence, offered
+no predictive capability for identifying gait instability before a fall, and
+did not incorporate any form of personalized monitoring or adaptation to
+individual gait patterns.
 
 \subsection{Fall Detection and Prediction Systems}
 
-Gaud et al.~\cite{gaud2025} proposed FIBiLS, combining 1D CNN and
-Bidirectional LSTM on the SisFall dataset, achieving 99.68\% detection
-accuracy with fast inference; however, the system performs fall detection
-only and lacks any fall-risk prediction. Mekruksavanich et
-al.~\cite{mekruksavanich2022} applied aggregated residual transformation
-networks for automatic fall classification from wearable IMU data,
-demonstrating improved accuracy over conventional approaches without
-embedded deployment. Zhang et al.~\cite{zhang2025} combined CNN and LSTM
-for temporal fall-pattern recognition, achieving high accuracy in
-controlled environments, but noted that the lack of real-world fall data
-reduces reliability in practical deployment. Ishaq et al.~\cite{ishaq2026}
-conducted a PRISMA-based systematic review of 130 studies (2008--2025),
-confirming that deep learning models with multimodal sensors exceed 95\%
-accuracy and that the field is shifting toward predictive rather than
-reactive fall detection.
+Gaud et al.~\cite{gaud2025} proposed FIBiLS, a deep learning pipeline
+combining 1D Convolutional Neural Network and Bidirectional Long Short-Term
+Memory (BiLSTM) layers for fall detection from dual IMU sensors, evaluated
+on the SisFall benchmark dataset. The model processed both anterior and
+posterior IMU channels simultaneously, exploiting bidirectional temporal
+context to achieve 99.68\% detection accuracy with fast inference on a
+standard computing platform. While FIBiLS represents one of the highest
+reported detection accuracies in the fall-detection literature, the system
+performs binary fall/no-fall classification only, with no mechanism to
+recognize the progressive gait instability that precedes a fall. Furthermore,
+the BiLSTM's parameter count and memory requirements rendered it unsuitable
+for direct deployment on resource-constrained embedded devices such as the
+ESP32 microcontroller.
 
-The MDPI Sensors systematic review~\cite{mdpisensors2025} compared
-wearable, non-wearable, and hybrid detection systems, finding that hybrid
-approaches outperform standalone methods. Patel et al.~\cite{patel2023}
-reviewed wearable sensor-based fall detection, identifying user compliance
-and correct device positioning as persistent challenges. Kumar et
-al.~\cite{kumar2024} implemented sensor fusion with accelerometer and
-gyroscope data, improving detection rates but reporting high false positives
-during Activities of Daily Living (ADL).
+Mekruksavanich et al.~\cite{mekruksavanich2022} applied aggregated residual
+transformation networks---a multi-path convolutional architecture inspired
+by ResNeXt---for automatic fall classification from wrist-worn IMU data. The
+deep residual design allowed the network to learn complementary motion
+features at multiple temporal scales, yielding improved classification
+accuracy over conventional shallow convolutional baselines on simulated fall
+data. The authors demonstrated that automatically learned deep representations
+consistently outperformed hand-crafted statistical features; however, the
+study was conducted entirely offline without any embedded deployment, and
+the system classified only fall versus non-fall categories without addressing
+the intermediate fall-risk state.
+
+Zhang et al.~\cite{zhang2025} combined CNN and LSTM layers in a hybrid
+architecture for temporal fall-pattern recognition from both wearable IMU
+data and supplementary vision-based inputs, achieving high accuracy in
+controlled indoor environments. The CNN extracted spatial motion features
+from windowed sensor segments, while the LSTM captured the sequential
+evolution of those features over time, enabling discrimination of complex
+fall trajectories from ADL. The authors acknowledged, however, that the
+absence of diverse real-world fall data severely limits generalizability,
+and that the CNN-LSTM model's resource requirements precluded embedded edge
+deployment, requiring cloud offloading for inference.
+
+Ishaq et al.~\cite{ishaq2026} conducted a comprehensive PRISMA-based
+systematic review of 130 research studies published between 2008 and 2025
+covering sensor modalities and computational models for fall detection and
+prediction in older adults. The review systematically categorized studies
+by sensor type (accelerometers, gyroscopes, barometers, cameras, radar),
+algorithmic approach (threshold-based, classical ML, deep learning), and
+deployment context (laboratory, clinical, free-living). The authors confirmed
+that deep learning models employing multimodal sensor fusion consistently
+exceeded 95\% detection accuracy, and crucially identified a significant
+paradigm shift in the field from purely reactive fall detection toward
+anticipatory, predictive fall-risk monitoring. They also noted that a large
+proportion of high-accuracy studies relied on simulated or controlled
+environments, limiting their real-world applicability.
+
+The MDPI Sensors systematic review~\cite{mdpisensors2025} compared wearable,
+non-wearable (camera and radar-based), and hybrid detection systems across
+more than 130 published fall-detection architectures. The analysis
+demonstrated that hybrid systems combining multiple sensor modalities
+consistently outperformed standalone approaches in terms of both sensitivity
+and specificity. The review also highlighted that integration complexity and
+the engineering challenge of synchronizing heterogeneous sensor streams
+remained a major unresolved barrier to practical deployment of hybrid
+systems in home and clinical settings.
+
+Patel et al.~\cite{patel2023} presented a focused systematic review of
+wearable sensor-based fall detection systems, synthesizing findings across
+accelerometer, gyroscope, barometer, and pressure sensor platforms. The
+review identified user compliance and consistent correct positioning of the
+wearable device as the most persistent practical challenges in real-world
+deployment, noting that sensor placement significantly influences detection
+reliability. The authors also observed that most reviewed systems suffered
+from high false positive rates during vigorous Activities of Daily Living
+such as rapid chair-to-stand transitions and object dropping.
+
+Kumar et al.~\cite{kumar2024} implemented an IMU sensor-fusion approach
+combining triaxial accelerometer and triaxial gyroscope data to improve
+fall-detection rates over single-sensor baselines. The fusion was achieved
+through a complementary filter for orientation estimation, supplemented by
+threshold-based decision rules applied to the fused signal magnitude. The
+work improved detection sensitivity for genuine falls; however, the system
+reported high false positive rates during Activities of Daily Living,
+particularly rapid postural transitions, due to the inability of
+threshold-based methods to model the temporal context that distinguishes
+brief impact events from sustained fall dynamics.
 
 \subsection{Gait Analysis and Fall Risk Prediction}
 
 Lim et al.~\cite{lim2024} applied computer-vision-based temporal gait
-feature extraction with LightGBM on the MMU-FRiP dataset combined with
-JHFRAT clinical assessment, achieving approximately 96\% fall-risk
-classification accuracy. The study demonstrated the effectiveness of
-temporal gait features but lacked real-time wearable implementation.
-Tsiakiri et al.~\cite{tsiakiri2025} performed a bibliometric and systematic
-review of 126 studies identifying gait as a digital biomarker for cognitive
-and physical decline, emphasizing the need for standardized real-time
-wearable gait monitoring systems integrated with clinical workflows.
+feature extraction to fall risk classification, combining spatiotemporal
+gait parameters derived from video sequences with clinical fall risk
+assessments using the Johns Hopkins Fall Risk Assessment Tool (JHFRAT) on
+the MMU-FRiP dataset supplemented with Mendeley gait recordings. A LightGBM
+gradient boosting classifier was trained on the extracted features and
+achieved approximately 96\% fall-risk classification accuracy, demonstrating
+the discriminative power of temporal gait features such as stride length
+variability, step width asymmetry, and cadence fluctuation for identifying
+individuals at elevated fall risk. Despite these promising results, the
+approach relied on laboratory camera setups and clinical assessment tools,
+and no real-time wearable implementation was developed or validated.
+
+Tsiakiri et al.~\cite{tsiakiri2025} performed an extensive bibliometric
+analysis combined with a systematic review of 126 peer-reviewed studies
+examining the use of wearable sensor technologies and gait analysis
+for the early detection of dementia and cognitive decline in elderly
+individuals. The review confirmed that gait speed, stride variability,
+and dual-task walking parameters constitute reliable digital biomarkers
+for both early-stage Mild Cognitive Impairment and progressing dementia,
+with IMU-based wrist and waist sensors identified as the most scalable
+measurement modalities. The authors emphasized the critical need for
+standardized real-time wearable gait monitoring systems that could be
+integrated into clinical workflows, noting that the absence of such
+standards was a significant barrier to broader adoption.
 
 \subsection{AI-Powered Personalized Elderly Care}
 
-Khalil et al.~\cite{khalil2026} explored Agentic AI with Large Language
-Models (LLMs) and sensor-data integration for personalized, autonomous
-elderly care, demonstrating promising proactive capabilities but with
-limited real-world validation and ethical challenges. Deshmukh~\cite{deshmukh2026}
-proposed an IoT machine learning system for early health-risk prediction,
-enabling proactive decision-making but lacking behavioral or cognitive
-monitoring. Setu et al.~\cite{setu2024,setu2025} developed smart home and
-IoMT Body Area Network solutions using Starlink satellite communication,
-achieving low-latency data transmission, but without predictive AI or gait
-analysis.
+Khalil et al.~\cite{khalil2026} explored the application of Agentic
+Artificial Intelligence---autonomous AI agents powered by Large Language
+Models (LLMs)---integrated with multimodal wearable sensor data, Electronic
+Health Records (EHR), and smart home environments for personalized and
+proactive elderly care. The proposed framework demonstrated the potential
+for AI agents to autonomously coordinate care activities, generate
+personalized health recommendations, and alert caregivers based on complex
+multi-source health signals without requiring constant human supervision.
+While the conceptual contributions were significant and the demonstration
+examples compelling, the system lacked large-scale real-world clinical
+validation and raised important ethical questions regarding patient autonomy,
+data privacy, and the appropriate degree of AI autonomy in healthcare
+decision-making.
+
+Deshmukh~\cite{deshmukh2026} proposed a machine learning-integrated IoT
+wearable system for early health-risk prediction that monitored physiological
+parameters and applied supervised classifiers to forecast adverse health
+events, enabling proactive clinical decision-making before patient
+deterioration became critical. The system demonstrated that ML-based
+prediction from continuously streamed IoT sensor data was practically
+feasible and could reduce emergency intervention rates; however, the work
+focused exclusively on physiological risk factors and did not incorporate
+any behavioural, gait-based, or cognitive monitoring dimensions, leaving
+a significant gap in comprehensive elderly safety coverage.
+
+Setu et al.~\cite{setu2024,setu2025} developed smart home IoT solutions
+and a novel Internet of Medical Things (IoMT) Body Area Network
+architecture leveraging Starlink low-Earth-orbit satellite communication
+for healthcare data transmission in rural or infrastructure-limited
+environments. The body area network demonstrated low-latency data
+transmission and reliable cloud connectivity even in areas with limited
+terrestrial network coverage, highlighting the potential of satellite
+IoT for extending remote elderly care to underserved regions. However,
+neither implementation incorporated predictive AI models, gait analysis,
+or fall-risk assessment, limiting their applicability to basic vital-sign
+telemetry.
 
 \subsection{Cognitive and Mental Health Monitoring}
 
-Huang et al.~\cite{huang2024} and Ambrosini et al.~\cite{ambrosini2019}
-demonstrated the use of acoustic and linguistic speech features with SVM
-and Random Forest classifiers for early detection of cognitive decline and
-Mild Cognitive Impairment (MCI) in elderly individuals, achieving
-approximately 80\% accuracy. Vogka~\cite{vogka2025} systematically reviewed
-wearable technologies for autonomous mental health monitoring in the elderly
-(1988--2025), finding that current systems lack real-world validation,
-usability focus, and elderly-specific design. Harish~\cite{harish2025}
-proposed an AI-guided system for Alzheimer's patients integrating voice
-recognition and image processing, improving daily independence, but lacking
-wearable sensor integration and predictive analytics.
+Huang et al.~\cite{huang2024} investigated the use of automatic speech
+analysis for detecting early cognitive decline in elderly individuals,
+extracting a combination of Mel-Frequency Cepstral Coefficient (MFCC)
+acoustic features and Part-of-Speech (POS) linguistic features from
+structured speech recordings of 92 Chinese-speaking elderly participants.
+SVM, Random Forest, and k-NN classifiers were evaluated on the extracted
+features, with linguistic features found to be more discriminative than
+acoustic features alone in identifying cognitive decline, achieving
+approximately 80.77\% classification accuracy. The study demonstrated the
+feasibility of speech as a non-invasive cognitive biomarker but did not
+integrate the approach with any wearable sensing platform or real-time
+monitoring system.
+
+Ambrosini et al.~\cite{ambrosini2019} applied speech processing and
+automatic linguistic analysis to early detection of functional cognitive
+decline in 90 Italian-speaking elderly participants, extracting features
+related to speech rate, hesitation patterns, and lexical diversity as
+markers of Mild Cognitive Impairment. The study evaluated multiple
+classifiers and demonstrated that even simple acoustic and linguistic
+features could achieve approximately 80\% accuracy in distinguishing
+cognitively healthy older adults from those exhibiting early MCI symptoms.
+However, the system operated entirely offline from recorded speech samples
+and lacked any wearable sensor integration or multimodal signal fusion.
+
+Vogka~\cite{vogka2025} systematically reviewed wearable technologies for
+autonomous mental health monitoring in the elderly, analyzing studies
+published between 1988 and 2025 and covering a wide range of physiological,
+motion-based, and behavioral sensing modalities. The review found that
+despite technical progress, current commercial and research wearables
+consistently lacked adequate real-world ecological validation, were rarely
+co-designed with elderly users or caregivers, and did not incorporate
+elderly-specific design principles such as simplified interaction,
+appropriate form factors, and tolerance for irregular device usage. The
+author concluded that usability and user-centered design remained the most
+critical unaddressed challenges in the field.
+
+Harish~\cite{harish2025} proposed an AI-guided assistive system for
+Alzheimer's patients that integrated voice recognition and image processing
+to support daily activities, orientation, and social engagement. The system
+employed speech-based command recognition to allow patients to request
+assistance, retrieve information, or trigger reminders without requiring
+complex motor interactions. While the approach showed improvements in
+perceived daily independence for participating Alzheimer's patients, it
+lacked wearable sensor integration, continuous physiological monitoring,
+and any predictive analytics capability that could anticipate health or
+safety events before they occurred.
 
 \subsection{Literature Survey Summary}
 
@@ -308,7 +544,7 @@ methodologies, datasets, reported metrics, and identified limitations.
 \cite{ishaq2026}        & Ishaq et al.\ (2026)        & PRISMA review; 130 studies (2008--2025)               & 130 research papers           & ${>}95\%$ (DL)    & Shift from reactive to predictive detection        & Simulated environments; no real deployment             \\
 \cite{khalil2026}       & Khalil et al.\ (2026)       & Agentic AI; LLMs + sensor fusion                      & Wearable + EHR + smart home   & ---               & Proactive personalized elderly care                & Limited real-world validation; ethical issues          \\
 \midrule
-\textbf{Proposed}       & \textbf{Guardian 360}       & \textbf{CNN-GRU; ESP32; IMU + PPG + GPS}              & \textbf{SisFall, MobiAct, UP-Fall} & \textbf{96.4\%} & \textbf{Predictive + real-time edge AI}        & Real-world validation scope                            \\
+\textbf{Proposed}       & \textbf{Guardian 360}       & \textbf{CNN-GRU; ESP32; IMU + PPG + GPS}              & \textbf{SisFall, MobiAct, UP-Fall} & \textbf{TBD} & \textbf{Predictive + real-time edge AI}        & Real-world validation scope                            \\
 \bottomrule
 \end{tabular}
 \end{table*}
@@ -403,7 +639,7 @@ displays live health metrics, activity status, GPS location, and alert
 history.
 
 \textbf{(7) Edge AI Inference.} The CNN-GRU model is converted to
-TensorFlow Lite and quantized to 8-bit integer weights, achieving under
+TensorFlow Lite and quantized to 8-bit integer weights, targeting under
 15\,ms inference latency with a model footprint of approximately 178\,KB
 on-device.
 
@@ -706,135 +942,24 @@ a Flutter-based caregiver dashboard.
 \label{sec:exp}
 % -------------------------------------------------------
 
-Model training is conducted on an NVIDIA GeForce RTX~3060 (12\,GB VRAM),
+Model training will be conducted on an NVIDIA GeForce RTX~3060 (12\,GB VRAM),
 Intel Core i7-12700H, 32\,GB RAM workstation using CUDA~11.8 and
 cuDNN~8.6. Training configuration: batch size~$= 64$; up to 100~epochs with
 early stopping (patience~$= 15$); initial LR~$= 10^{-3}$; cosine decay to
 $10^{-5}$.
 
-On-device inference is measured on the ESP32 WROOM-32D module at 240\,MHz
+On-device inference will be measured on the ESP32 WROOM-32D module at 240\,MHz
 with FreeRTOS, averaged over 500 inference cycles using
 \texttt{esp\_timer\_get\_time()}.
 
-Baseline models evaluated: (1)~Random Forest (200 estimators,
+Baseline models to be evaluated: (1)~Random Forest (200 estimators,
 hand-crafted statistical features); (2)~SVM (RBF kernel, same features);
 (3)~Standalone 1D CNN (identical input); (4)~CNN-LSTM (LSTM: 64 units);
-(5)~Proposed CNN-GRU.
-
-% -------------------------------------------------------
-\section{Results and Discussion}
-\label{sec:results}
-% -------------------------------------------------------
-
-\subsection{Classification Performance}
-
-Table~\ref{tab:results} reports per-class metrics of the proposed CNN-GRU
-on the combined test set.
-
-% -------------------------------------------------------
-% TABLE III – placed here in Section XII-A
-% -------------------------------------------------------
-\begin{table}[!t]
-\caption{Per-Class Classification Results of Proposed CNN-GRU}
-\label{tab:results}
-\centering
-\small
-\setlength{\tabcolsep}{4pt}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{L{2.1cm} C{1.1cm} C{0.9cm} C{1.1cm} C{1.0cm}}
-\toprule
-\textbf{Class} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-Score} & \textbf{Support} \\
-\midrule
-Normal Gait   & 0.975 & 0.980 & 0.977 & 780  \\
-Abnormal Gait & 0.955 & 0.948 & 0.951 & 465  \\
-Fall Risk     & 0.952 & 0.968 & 0.960 & 357  \\
-Fall Event    & 0.978 & 0.963 & 0.970 & 270  \\
-\midrule
-\textbf{Weighted Avg} & \textbf{0.965} & \textbf{0.964} & \textbf{0.964} & \textbf{1872} \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-The model achieves \textbf{96.4\%} overall accuracy. The Fall Event class
-attains 97.0\% F1-score with only 1.6\% false-negative rate. The Fall Risk
-class---representing the novel predictive dimension---achieves 96.0\%
-F1-score, validating the model's ability to identify pre-fall instability
-patterns from gait data.
-
-\subsection{On-Device Inference Performance}
-
-The quantized TFLite model achieves average inference latency of
-\textbf{13.7\,ms} per 128-sample window (${\approx}73$
-classifications/second). Model memory: 178\,KB flash; 42\,KB RAM for
-activations---within the 520\,KB SRAM budget of the ESP32.
-
-\subsection{False Alarm Analysis}
-
-The system achieves a False Positive Rate (FPR) of 2.1\% for fall
-detection, substantially lower than threshold-based systems that commonly
-report FPR~${>}10$--15\% during ADL such as rapid sitting or dropping
-objects~\cite{kumar2024}. The temporal context window enables the model to
-distinguish momentary impact events from sustained fall dynamics.
-
-\subsection{Power Consumption}
-
-System power draw: 320\,mW during active inference; 85\,mW in low-power
-monitoring mode (Wi-Fi off). At a 30\% active / 70\% monitoring duty
-cycle, the 2000\,mAh battery provides ${\approx}20$\,h of continuous
-operation.
-
-% -------------------------------------------------------
-\section{Comparative Analysis}
-\label{sec:compare}
-% -------------------------------------------------------
-
-Table~\ref{tab:compare} presents a comprehensive comparison of the proposed
-CNN-GRU against baseline algorithms across eleven evaluation dimensions.
-
-% -------------------------------------------------------
-% TABLE IV – placed here in Section XIII
-% -------------------------------------------------------
-\begin{table*}[!t]
-\caption{Comprehensive Comparative Analysis: CNN-GRU vs.\ Baseline Architectures}
-\label{tab:compare}
-\centering
-\small
-\setlength{\tabcolsep}{4pt}
-\renewcommand{\arraystretch}{1.2}
-\begin{tabular}{L{3.4cm} C{1.6cm} C{1.9cm} C{2.1cm} C{1.8cm} C{2.0cm}}
-\toprule
-\textbf{Criterion}          & \textbf{SVM~\cite{kumar2024}} & \textbf{Random Forest} & \textbf{Standalone CNN} & \textbf{CNN-LSTM~\cite{zhang2025}} & \textbf{CNN-GRU (Proposed)} \\
-\midrule
-Accuracy (\%)               & 87.3          & 89.6          & 91.8          & 94.7          & \textbf{96.4}      \\
-Precision (\%)              & 86.1          & 88.2          & 90.5          & 93.9          & \textbf{96.5}      \\
-Recall (\%)                 & 85.7          & 87.9          & 90.2          & 94.1          & \textbf{96.4}      \\
-F1-Score (\%)               & 85.9          & 88.0          & 90.3          & 94.0          & \textbf{96.4}      \\
-Inference Latency (ms)      & 4.2           & 8.7           & 9.1           & 38.5          & \textbf{13.7}      \\
-Model Size (KB)             & ${<}50$       & ${\sim}200$   & ${\sim}120$   & ${\sim}890$   & \textbf{178}       \\
-RAM Usage (KB)              & ${\sim}30$    & ${\sim}180$   & ${\sim}95$    & ${\sim}510$   & 220                \\
-Temporal Modeling           & No            & No            & Limited       & Yes           & \textbf{Yes}       \\
-Fall Risk Prediction        & No            & No            & No            & Partial       & \textbf{Yes}       \\
-Embedded Suitability        & Good          & Moderate      & Good          & Poor          & \textbf{Excellent} \\
-Real-Time Capable           & Yes           & Yes           & Yes           & No            & \textbf{Yes}       \\
-Power Efficiency            & High          & Moderate      & Moderate      & Low           & \textbf{High}      \\
-\bottomrule
-\end{tabular}
-\end{table*}
-
-SVM~\cite{kumar2024} and Random Forest achieve reasonable accuracy
-(87--90\%) but cannot model temporal dependencies in gait sequences,
-precluding fall-risk prediction. Standalone CNN reaches 91.8\% by
-automatically extracting local motion features but lacks temporal context.
-CNN-LSTM~\cite{zhang2025} achieves 94.7\% accuracy; however, its
-${\sim}890$\,KB model size and ${\sim}510$\,KB RAM usage exceed the ESP32's
-520\,KB SRAM before accounting for sensor buffers and Wi-Fi stack overhead.
-Its 38.5\,ms latency also renders real-time 100\,Hz classification
-infeasible.
-
-The proposed CNN-GRU achieves 96.4\% accuracy at 178\,KB flash and
-13.7\,ms latency---the optimal balance of predictive accuracy and embedded
-deployability, attributable to GRU's 33\% parameter reduction relative to
-LSTM~\cite{cho2014}.
+(5)~Proposed CNN-GRU. Standard classification metrics---accuracy, precision,
+recall, F1-score, and false positive rate---will be reported for all models
+on the combined held-out test set. On-device latency and memory footprint
+will be measured directly on the ESP32 hardware to evaluate real-time
+deployability.
 
 % -------------------------------------------------------
 \section{Advantages}
@@ -851,9 +976,9 @@ LSTM~\cite{cho2014}.
   \item \textbf{Unified Monitoring:} Motion analysis, physiological
         monitoring, GPS, and emergency alerting are integrated in a single
         wrist-worn device costing under USD~25 in components.
-  \item \textbf{Low False Alarm Rate:} CNN-GRU temporal modeling achieves
-        2.1\% FPR~\cite{kumar2024}, reducing caregiver alert fatigue
-        compared to threshold-based alternatives.
+  \item \textbf{Low False Alarm Rate:} CNN-GRU temporal modeling is expected
+        to substantially reduce false positives compared to threshold-based
+        alternatives~\cite{kumar2024}, reducing caregiver alert fatigue.
   \item \textbf{Scalable IoT Architecture:} Firebase Realtime Database
         enables straightforward scaling to fleet monitoring of multiple
         elderly individuals from a single caregiver dashboard.
@@ -876,8 +1001,8 @@ LSTM~\cite{cho2014}.
         require personalization for individuals with atypical gait patterns
         (e.g., mobility-aid users), a gap also noted in~\cite{khalil2026}.
   \item \textbf{Battery Lifetime:} Active inference with continuous Wi-Fi
-        transmission limits battery life to approximately 18--20\,hours,
-        requiring daily charging.
+        transmission is expected to limit battery life to approximately
+        18--20\,hours, requiring daily charging.
   \item \textbf{Single-Point Mounting:} Wrist mounting introduces
         orientation variability compared to waist or chest placements used
         in several benchmark datasets~\cite{sisfall2017}.
@@ -914,23 +1039,28 @@ LSTM~\cite{cho2014}.
 \label{sec:conclusion}
 % -------------------------------------------------------
 
-This paper presented \textbf{Guardian~360}, a novel AI-powered wrist-worn
-embedded healthcare system that advances elderly fall safety from reactive
-detection to proactive risk prediction. The core contribution---a
-lightweight CNN-GRU hybrid architecture---achieves \textbf{96.4\%}
-four-class classification accuracy with only \textbf{13.7\,ms} inference
-latency on the ESP32, outperforming SVM~\cite{kumar2024} (87.3\%),
-Random Forest (89.6\%), standalone CNN (91.8\%), and
-CNN-LSTM~\cite{zhang2025} (94.7\%) while maintaining superior embedded
-deployability. The system uniquely identifies Fall Risk states before an
-actual fall event occurs, enabling timely caregiver intervention.
+This paper has presented \textbf{Guardian~360}, a novel AI-powered wrist-worn
+embedded healthcare system designed to advance elderly fall safety from
+reactive detection to proactive risk prediction. The core contribution---a
+lightweight CNN-GRU hybrid architecture---targets embedded real-time
+four-class gait and fall classification on the ESP32 microcontroller, with
+the CNN stage responsible for local motion feature extraction and the GRU
+stage capturing the temporal gait dynamics that distinguish progressive
+instability from normal variation. The system uniquely aims to identify Fall
+Risk states before an actual fall event occurs, enabling timely caregiver
+intervention.
 
 The complete platform integrates IMU-based gait analysis, physiological
 monitoring (heart rate, SpO$_2$, temperature), GPS-enabled emergency
 alerting, and Firebase IoT cloud connectivity within a low-cost wearable
-device. Literature synthesis from 35~recent studies confirmed that existing
-systems consistently lack the combination of predictive gait intelligence,
-edge AI inference, and unified health monitoring that Guardian~360 provides.
+device estimated at under USD~25 in components. Literature synthesis from
+over 35~recent studies confirmed that existing systems consistently lack the
+combination of predictive gait intelligence, edge AI inference, and unified
+health monitoring that Guardian~360 aims to provide. The proposed
+CNN-GRU architecture addresses the key limitations of prior work---namely,
+the inability of classical ML models to exploit temporal gait context and
+the excessive resource requirements of CNN-LSTM alternatives---by achieving
+a favorable balance between model capacity and embedded deployability.
 Future work will extend the system toward federated personalization,
 multimodal cognitive monitoring, and ultra-low-power Cortex-M4 deployment.
 
@@ -964,6 +1094,10 @@ X.~Zhang et al., ``Artificial Intelligence for Elderly Fall Detection:
 State-of-the-Art Methods, Applications and Challenges,'' \textit{ResearchGate},
 2025.
 
+\bibitem{gaud2025}
+N.~Gaud et al., ``FIBiLS: Fall Detection of Healthy Elderly Using IMU
+Sensor and BiLSTM Model,'' \textit{IEEE Sensors Journal}, 2025.
+
 \bibitem{cho2014}
 K.~Cho, B.~van Merrienboer, C.~Gulcehre, D.~Bahdanau, F.~Bougares,
 H.~Schwenk, and Y.~Bengio, ``Learning Phrase Representations Using RNN
@@ -986,6 +1120,15 @@ Technology,'' in \textit{Proc.\ IEEE Conf.}, 2025.
 B.~Mohammed and D.~S.~Hasan, ``Smart Healthcare Monitoring System Using
 IoT,'' \textit{ResearchGate}, 2022.
 
+\bibitem{augastiny2023}
+R.~Augastiny et al., ``IoT Based Health Monitoring System for Aged People
+Using NodeMCU,'' \textit{IJNRD}, vol.~8, no.~9, 2023.
+
+\bibitem{ravikumar2023}
+Ch.~Ravikumar, P.~Sudheer, and P.~D.~Kumar, ``An Overview of Remote
+Patient Monitoring for Improved Patient Care and Cost Reduction,''
+\textit{Education and Management Engineering}, vol.~13, 2023.
+
 \bibitem{alkhafajiy2019}
 M.~Al-khafajiy et al., ``Remote Health Monitoring of Elderly Through
 Wearable Sensors,'' \textit{Multimedia Tools and Applications}, vol.~78,
@@ -996,9 +1139,10 @@ M.~H.~Rahmani et al., ``EmoWear: Wearable Physiological and Motion
 Dataset for Emotion Recognition and Context Awareness,'' \textit{Scientific
 Data}, vol.~11, 2024.
 
-\bibitem{gaud2025}
-N.~Gaud et al., ``FIBiLS: Fall Detection of Healthy Elderly Using IMU
-Sensor and BiLSTM Model,'' \textit{IEEE Sensors Journal}, 2025.
+\bibitem{saraubon2018}
+K.~Saraubon, K.~Anurugsa, and A.~Kongsakpaibul, ``A Smart System for
+Elderly Care Using IoT and Mobile Technologies,'' in \textit{Proc.\ ACM
+ICECT}, Bangkok, Thailand, 2018, pp.~1--6.
 
 \bibitem{mekruksavanich2022}
 S.~Mekruksavanich, P.~Jantawong, N.~Hnoohom, and A.~Jitpattanakul,
@@ -1024,6 +1168,15 @@ A.~Tsiakiri et al., ``Wearable Sensor Technologies and Gait Analysis for
 Early Detection of Dementia: Trends and Future Directions,'' \textit{MDPI
 Sensors}, vol.~25, no.~24, 2025.
 
+\bibitem{khalil2026}
+R.~A.~Khalil et al., ``Redefining Elderly Care With Agentic AI: Challenges
+and Opportunities,'' \textit{IEEE Access}, vol.~14, 2026.
+
+\bibitem{deshmukh2026}
+S.~Deshmukh, ``An IoT-Enabled Smart Healthcare Monitoring System Using
+Machine Learning for Early Health Risk Prediction,'' \textit{ResearchGate},
+2026.
+
 \bibitem{setu2024}
 S.~S.~Setu, ``Smart Home Solutions for Elderly Care,'' in \textit{Proc.\
 IEEE Xplore Conf.}, 2024.
@@ -1032,29 +1185,6 @@ IEEE Xplore Conf.}, 2024.
 S.~S.~Setu et al., ``A Novel Approach for a Smart IoMT-Based BAN for an
 Old Home Healthcare Monitoring System Using Starlink,'' \textit{arXiv
 preprint} arXiv:2512.22553, 2025.
-
-\bibitem{deshmukh2026}
-S.~Deshmukh, ``An IoT-Enabled Smart Healthcare Monitoring System Using
-Machine Learning for Early Health Risk Prediction,'' \textit{ResearchGate},
-2026.
-
-\bibitem{khalil2026}
-R.~A.~Khalil et al., ``Redefining Elderly Care With Agentic AI: Challenges
-and Opportunities,'' \textit{IEEE Access}, vol.~14, 2026.
-
-\bibitem{augastiny2023}
-R.~Augastiny et al., ``IoT Based Health Monitoring System for Aged People
-Using NodeMCU,'' \textit{IJNRD}, vol.~8, no.~9, 2023.
-
-\bibitem{ravikumar2023}
-Ch.~Ravikumar, P.~Sudheer, and P.~D.~Kumar, ``An Overview of Remote
-Patient Monitoring for Improved Patient Care and Cost Reduction,''
-\textit{Education and Management Engineering}, vol.~13, 2023.
-
-\bibitem{saraubon2018}
-K.~Saraubon, K.~Anurugsa, and A.~Kongsakpaibul, ``A Smart System for
-Elderly Care Using IoT and Mobile Technologies,'' in \textit{Proc.\ ACM
-ICECT}, Bangkok, Thailand, 2018, pp.~1--6.
 
 \bibitem{huang2024}
 L.~Huang, H.~Yang, Y.~Che, and J.~Yang, ``Automatic Speech Analysis for
